@@ -1,0 +1,120 @@
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player.PlayerGui
+screenGui.Name = "ArmasMenu"
+screenGui.ResetOnSpawn = false
+
+-- Crear el marco del menú
+local menuFrame = Instance.new("Frame")
+menuFrame.Size = UDim2.new(0.3, 0, 0.3, 0)  -- Usando tamaño relativo
+menuFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+menuFrame.AnchorPoint = Vector2.new(0.5, 0.5)  -- Centrado del marco
+menuFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+menuFrame.Parent = screenGui
+
+-- Hacer que el menú sea arrastrable
+menuFrame.Active = true
+menuFrame.Draggable = true
+
+-- Crear el botón "Conseguir Armas"
+local conseguirButton = Instance.new("TextButton")
+conseguirButton.Size = UDim2.new(0.6, 0, 0.2, 0)  -- Usando tamaño relativo
+conseguirButton.Position = UDim2.new(0.5, 0, 0.3, 0)
+conseguirButton.AnchorPoint = Vector2.new(0.5, 0.5)  -- Centrado del botón
+conseguirButton.Text = "Conseguir 10 Armas"
+conseguirButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+conseguirButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+conseguirButton.Parent = menuFrame
+
+-- Crear el botón "Infinite Yield"
+local infiniteYieldButton = Instance.new("TextButton")
+infiniteYieldButton.Size = UDim2.new(0.6, 0, 0.2, 0)  -- Usando tamaño relativo
+infiniteYieldButton.Position = UDim2.new(0.5, 0, 0.6, 0.25)
+infiniteYieldButton.AnchorPoint = Vector2.new(0.5, 0.5)  -- Centrado del botón
+infiniteYieldButton.Text = "Infinite Yield"
+infiniteYieldButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+infiniteYieldButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+infiniteYieldButton.Parent = menuFrame
+
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0.1, 0, 0.17, 0)  -- Usando tamaño relativo
+minimizeButton.Position = UDim2.new(0.82, 0, 0.1, 0)
+minimizeButton.AnchorPoint = Vector2.new(0.5, 0.5)  -- Centrado del botón
+minimizeButton.Text = "-"
+minimizeButton.TextScaled = true
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton.TextStrokeTransparency = 0.4  -- Hacer que el contorno sea completamente visible
+minimizeButton.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)  -- Contorno negro para contraste
+minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+minimizeButton.Parent = menuFrame
+
+-- Función al presionar el botón "Infinite Yield"
+infiniteYieldButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+end)
+
+conseguirButton.MouseButton1Click:Connect(function()
+    for i = 1, 10 do
+        game.ReplicatedStorage.SpawnSuperBlock:FireServer()
+        task.wait(0.1) -- Pequeña pausa para evitar posibles problemas de rendimiento
+    end
+end)
+
+-- Crear el botón "X" para cerrar el menú
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0.1, 0, 0.17, 0)  -- Usando tamaño relativo
+closeButton.Position = UDim2.new(0.94, 0, 0.1, 0)
+closeButton.AnchorPoint = Vector2.new(0.5, 0.5)  -- Centrado del botón
+closeButton.Text = "X"
+closeButton.TextSize = 15
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextStrokeTransparency = 0  -- Contorno visible
+closeButton.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)  -- Contorno negro para contraste
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.Parent = menuFrame
+
+-- Función al presionar el botón "X" para cerrar el ScreenGui
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+-- Variables para controlar el estado de minimización
+local isMinimized = false
+
+-- Función para alternar el estado de minimización
+local function toggleMinimize()
+    if isMinimized then
+        -- Maximizar el menú
+        menuFrame.Size = UDim2.new(0.3, 0, 0.3, 0)  -- Usando tamaño relativo
+        conseguirButton.Visible = true
+        infiniteYieldButton.Visible = true
+        closeButton.Size = UDim2.new(0.1, 0, 0.17, 0)
+        closeButton.Position = UDim2.new(0.94, 0, 0.1, 0)
+        minimizeButton.Size = UDim2.new(0.1, 0, 0.17, 0)
+        minimizeButton.Position = UDim2.new(0.82, 0, 0.1, 0)
+    else
+        -- Minimizar el menú
+        menuFrame.Size = UDim2.new(0.3, 0, 0.05, 0)  -- Cambia el tamaño para simular minimización
+        conseguirButton.Visible = false
+        infiniteYieldButton.Visible = false
+        closeButton.Size = UDim2.new(0.07, 0, 0.8, 0)
+        closeButton.Position = UDim2.new(0.96, 0, 0.45, 0)
+        minimizeButton.Size = UDim2.new(0.07, 0, 0.8, 0)
+        minimizeButton.Position = UDim2.new(0.86, 0, 0.45, 0)
+    end
+    isMinimized = not isMinimized
+end
+
+minimizeButton.MouseButton1Click:Connect(function()
+toggleMinimize()
+end)
+
+local UserInputService = game:GetService("UserInputService")
+
+-- Controlar el cierre y apertura del menú con Ctrl derecho
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.LeftAlt then -- Usa Ctrl derecho en lugar de Alt
+        menuFrame.Visible = not menuFrame.Visible
+    end
+end)
